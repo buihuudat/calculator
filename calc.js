@@ -4,8 +4,8 @@
 
 $(document).ready(function () {
   const display = $("#display");
-  const buttons = $("button");
 
+  const buttons = $("button");
   const clearBtn = $("#clearButton");
   const equaBtn = $("#equalsButton");
 
@@ -16,15 +16,44 @@ $(document).ready(function () {
 
   const math = ["+", "*", "/", "-"];
 
+  // khai báo giá trị
   let cal = [];
   let currentOperation = "";
   let currentState = "default";
 
+  // hàm reset lại các giá trị
+  function reset() {
+    cal = [];
+    currentOperation = "";
+    currentState = "default";
+    $(display).val("");
+  }
+
+  function btnHandler(operator) {
+    if (
+      currentOperation &&
+      currentOperation !== operator &&
+      math.includes(cal[cal.length - 1])
+    ) {
+      currentOperation = operator;
+      return (cal[cal.length - 1] = currentOperation);
+    }
+
+    if (math.includes(currentOperation)) {
+      const rs = eval(cal.join(""));
+      $(display).val(rs);
+      cal = [];
+      cal.push(rs);
+    }
+
+    currentOperation = operator;
+    cal.push(currentOperation);
+  }
+
+  // hành động nhấn phím số
   buttons.on("click", function () {
     if (currentState === "reset") {
-      cal = [];
-      currentOperation = "";
-      $(display).val("");
+      reset();
     }
 
     if ($(this).val()) {
@@ -46,84 +75,23 @@ $(document).ready(function () {
     $(display).val(valueJoined);
   });
 
+  // hành động nhấn toán tử
   addBtn.on("click", function () {
-    if (
-      currentOperation &&
-      currentOperation !== "+" &&
-      math.includes(cal[cal.length - 1])
-    ) {
-      currentOperation = "+";
-      return (cal[cal.length - 1] = currentOperation);
-    }
-
-    if (math.includes(currentOperation)) {
-      const rs = eval(cal.join(""));
-      $(display).val(rs);
-      cal = [];
-      cal.push(rs);
-    }
-
-    currentOperation = "+";
-    cal.push(currentOperation);
+    btnHandler("+");
   });
   subBtn.on("click", function () {
-    if (
-      currentOperation &&
-      currentOperation !== "-" &&
-      math.includes(cal[cal.length - 1])
-    ) {
-      currentOperation = "-";
-      return (cal[cal.length - 1] = currentOperation);
-    }
-    if (math.includes(currentOperation)) {
-      const rs = eval(cal.join(""));
-      $(display).val(rs);
-      cal = [];
-      cal.push(rs);
-    }
-    currentOperation = "-";
-    cal.push(currentOperation);
+    btnHandler("-");
   });
   mulBtn.on("click", function () {
     if (!cal.length) return;
-    if (
-      currentOperation &&
-      currentOperation !== "*" &&
-      math.includes(cal[cal.length - 1])
-    ) {
-      currentOperation = "*";
-      return (cal[cal.length - 1] = currentOperation);
-    }
-    if (math.includes(currentOperation)) {
-      const rs = eval(cal.join(""));
-      $(display).val(rs);
-      cal = [];
-      cal.push(rs);
-    }
-    cal.push("*");
-    currentOperation = "*";
+    btnHandler("*");
   });
   divBtn.on("click", function () {
     if (!cal.length) return;
-    if (
-      currentOperation &&
-      currentOperation !== "/" &&
-      math.includes(cal[cal.length - 1])
-    ) {
-      currentOperation = "/";
-      return (cal[cal.length - 1] = currentOperation);
-    }
-
-    if (math.includes(currentOperation)) {
-      const rs = eval(cal.join(""));
-      $(display).val(rs);
-      cal = [];
-      cal.push(rs);
-    }
-    cal.push("/");
-    currentOperation = "/";
+    btnHandler("/");
   });
 
+  // hành động nhấn '='
   equaBtn.on("click", function () {
     if (!cal.length) return;
 
@@ -143,7 +111,6 @@ $(document).ready(function () {
       cal.push(currentOperation);
       return rs;
     }
-
     if (currentState === "equa") {
       cal.push(currentOperation, valueJoined.split(currentOperation)[1]);
       return $(display).val(eval(cal.join("")));
@@ -152,15 +119,8 @@ $(document).ready(function () {
     currentState = "equa";
   });
 
+  // hành đ��ng nhấn 'C'
   clearBtn.on("click", function () {
     reset();
   });
-
-  function reset() {
-    cal = [];
-    currentOperation = "";
-    currentState = "default";
-    $(display).val("");
-    count = 0;
-  }
 });
